@@ -51,6 +51,7 @@ if(CrossCompiling)
         PUBLIC
         src/main.cpp
         src/drivers/logging/logging.cpp
+        src/drivers/leds.cpp
     )
     target_include_directories(labs
         PUBLIC 
@@ -96,6 +97,7 @@ else()
         PUBLIC
         src/main.cpp
         src/drivers/logging/logging.cpp
+        src/drivers/leds.cpp
         tests/mocks/pico/stdlib.cpp
         tests/mocks/pico/time.cpp
         tests/mocks/hardware/gpio.cpp
