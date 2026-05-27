@@ -20,17 +20,27 @@ int main()
     for (;;) {
         // Test the log system
         log(LogLevel::INFORMATION, "Hello world");
-        
-        // Testing LEDs
-        for (int i = 0; i < NUM_LEDS; i++) { // for all 12 LEDs
-            led_set(i, rand() % 256, rand() % 256, rand() % 256); // rand() generates large integer, % 256 which will always be between 0-255
-        }
-        led_commit(); // update LED colour in hardware
-        sleep_ms(500); // wait a little
 
-        // Turn all off
-        led_clear_all(); // update LED colour in hardware
-        sleep_ms(500); // wait a little
+        // Assessment Demo 
+
+        // 1. The user code can request to change a single LED, without having to remember all the others. this means
+        //    your driver must memorise the previous values on the other LEDs so that they can be re-written during the
+        //    update. 
+        led_set(6, 255, 0, 0); // set the 7th LED to green
+        led_commit(); // update only the 6th LED (the others remain off)
+        led_clear_all(); // turn LED off
+        sleep_ms(1500); // wait a little before moving to next demo
+
+        // 2. The user code can make multiple changes to the LED information before "committing" the changes to the device.
+        led_set(2, 0, 0, 255); // set 3rd LED to blue
+        led_set(3, 0, 255, 0); // set 4th LED to red
+        led_commit(); // update the two LEDs in hardware
+        led_clear_all();
+        sleep_ms(1500); // wait a little before moving to next demo
+
+        // 3. As a convenience, there is a way to turn all the LEDs off. 
+        led_clear_all();
+
     }
 
     return 0;

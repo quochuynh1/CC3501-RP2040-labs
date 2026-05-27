@@ -11,13 +11,13 @@ static uint32_t led_data[NUM_LEDS]; // declare/initialise the led_data array
 
 void leds_init() {
     // Initialise PIO0 to control the LED chain
-    uint pio_program_offset = pio_add_program(pio0, &ws2812_program); // from starter code (just refactored)
+    uint pio_program_offset = pio_add_program(pio0, &ws2812_program); // refactored from start code
     ws2812_program_init(pio0, 0, pio_program_offset, LED_PIN, 800000, false);
 }
 
 void led_set(int index, uint8_t r, uint8_t g, uint8_t b) { 
     // Reorder rgb to grb (as per WS2812 datasheet)
-    led_data[index] = (g << 24) | (r << 16) | (b << 8); // green bits 31-24; red bits 23-16; blue bits 15-8 // store colour in array (index 0-11 represeting LED number)
+    led_data[index] = (g << 24) | (r << 16) | (b << 8); // green bits 31-24; red bits 23-16; blue bits 15-8 // store colour in array (index 0-11 represeting number of LEDs)
 }
 
 void led_commit() { 
