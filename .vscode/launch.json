@@ -22,7 +22,17 @@
             "runToEntryPoint": "main",
             "openOCDLaunchCommands": [
                 "adapter speed 1000"
-            ]
+            ],
+            "overrideLaunchCommands": [
+                "monitor reset init",
+                "load",
+                "monitor reset halt"
+            ],
+            "overrideRestartCommands": [
+                "monitor reset init",
+                "load",
+                "monitor reset halt"
+            ],
         },
         {
             "name": "(Windows) Launch Local Test Harness",
