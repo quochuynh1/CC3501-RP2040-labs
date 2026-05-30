@@ -26,7 +26,7 @@ int main()
         leds.set(1, 0, 255, 0); // LED 2 green
         leds.set(2, 0, 0, 255); // LED 3 blue
         leds.commit(); // turn first 3 LEDs RGB              
-        sleep_ms(1000);
+        sleep_ms(2000);
 
         leds.set(1, 255, 255, 255); // turn middle of those three white (shows changing of single LED
         leds.commit();              // while the others remain the same)
@@ -65,8 +65,14 @@ int main()
 
         leds.clear_all();
         sleep_ms(1000);
+
+        // Test Extension Functions 
+        // 2. Add a way to update multiple LEDs in a single funciton call. 
+        int multiple_leds[] = {8, 9, 10, 11}; // right panel LEDs
+        leds.set_multiple(multiple_leds, 4, 0, 0, 255); // turn them blue
+        sleep_ms(1000);
+        leds.clear_all(); 
+        sleep_ms(1000);
 }
-
-
     return 0;
 }

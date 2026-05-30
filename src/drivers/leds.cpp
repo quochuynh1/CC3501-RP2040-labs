@@ -21,7 +21,7 @@ void LEDS::set_all(uint8_t r, uint8_t g, uint8_t b) {
     for(int i = 0; i < LEDS::NUM_LEDS; i++) { // for all 12 LEDs (index 0-11)
         LEDS::set(i, r, g, b); // set their colour to 
     } 
-    LEDS::commit();
+    LEDS::commit(); // push changes to the board
 }
 
 void LEDS::commit() { 
@@ -34,4 +34,14 @@ void LEDS::commit() {
 void LEDS::clear_all() {
     // Set every LED's stored colour value to 0 (i.e., off)
     LEDS::set_all(0, 0, 0);
+}
+
+void LEDS::set_multiple(int* indices, int count, uint8_t r, uint8_t g, uint8_t b) {
+    // User provides an array of specific LEDs (e.g., int multiple_leds[] = {6, 7, 8}) to change colours
+    // int* indices = array name
+    // int count = length of array
+    for (int i = 0; i < count; i++) { // iterate over each index in the array
+        set(indices[i], r, g, b); // set the LED at that index to the given colour
+    }
+    LEDS::commit();
 }
