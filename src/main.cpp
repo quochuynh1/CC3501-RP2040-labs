@@ -73,6 +73,26 @@ int main()
         sleep_ms(1000);
         leds.clear_all(); 
         sleep_ms(1000);
+
+        // 3. Prorvide a way to query the current status of the LEDs
+        int led_index = 3; //
+        leds.set(led_index, 0, 255, 255); // set LED 4 to aqua
+        leds.commit();
+        LEDStatus status = leds.get(3); // query LED 3 only
+        printf("LED %d: R=%d G=%d B=%d\n", led_index, status.r, status.g, status.b); // print in serial port
+        
+        sleep_ms(1000);
+        leds.clear_all(); 
+        sleep_ms(1000);
+
+        leds.set_all(60, 70, 80); // set all LEDs to 
+        leds.commit(); 
+        leds.get_all(); // query status of all LEDs
+
+        sleep_ms(1000);
+        leds.clear_all(); 
+        sleep_ms(1000);
+
 }
     return 0;
 }

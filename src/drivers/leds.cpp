@@ -1,5 +1,6 @@
 #include "leds.h"
 #include <stdint.h>
+#include <stdio.h> // allows printf
 #include "hardware/gpio.h"
 #include "hardware/pio.h"
 #include "WS2812.pio.h"
@@ -44,4 +45,22 @@ void LEDS::set_multiple(int* indices, int count, uint8_t r, uint8_t g, uint8_t b
         set(indices[i], r, g, b); // set the LED at that index to the given colour
     }
     LEDS::commit();
+}
+
+LEDStatus LEDS::get(int index) {
+    // Takes an LED index and returns its current RGB values as an LEDStatus struct
+    LEDStatus colour; // create an empty LEDStatus variable to store the results
+    colour.r = led_data[index] >> 24 & 0xFF; // extract red by shifting bits 31-24 down to 7-0, mask to isolate bottom 8 bits
+    colour.g = led_data[index] >> 16 & 0xFF; // extract green by shifting bits 23-16 down to 7-0, mask to isolate bottom 8 bits
+    colour.b = led_data[index] >> 8 & 0xFF; // extract blue by shifting bits 15-8 down to 7-0, mask to isolate bottom 8 bits
+    return colour;  // return the LEDStatus struct variable
+}
+
+void LEDS::get_all() { 
+    // Queries and prints the current RGB values of all LEDs to the serial monitor.
+    // LED numbering is displayed as 1-12 (maps internally to index 0-11).
+    for (int i = 0; i < LEDS::NUM_LEDS; i++) { // for all 12 LEDs (index 0-11)
+        LEDStatus status = get(i); // iteratively query all 12 LEDs
+        printf("LED %d: R=%d G=s%d B=%d\n", i + 1, status.r, status.g, status.b); // print in serial port
+    }
 }
