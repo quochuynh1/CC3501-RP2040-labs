@@ -93,6 +93,17 @@ int main()
         leds.clear_all(); 
         sleep_ms(1000);
 
+        // 4. Allow the user code to query whether current values have been
+        // updated but not yet written to the LEDs.
+        leds.set(0, 255, 0, 0);
+        printf("Dirty: %d\n", leds.is_dirty()); // should print 1 (true) as changes have not been written
+
+        leds.commit();
+        printf("Dirty: %d\n", leds.is_dirty()); // should print 0 (false) as changes have been written
+
+        sleep_ms(1000);
+        leds.clear_all(); 
+        sleep_ms(1000);
 }
     return 0;
 }

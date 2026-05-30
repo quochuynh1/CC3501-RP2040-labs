@@ -18,8 +18,10 @@ class LEDS {
         void set_multiple(int* indices, int count, uint8_t r, uint8_t g, uint8_t b); // User provides an array of specific LEDs (e.g., int multiple_leds[] = {6, 7, 8}) to change colours; int* indices = array name; int count = length of array
         LEDStatus get(int index); // takes an LED index and returns its current RGB values as an LEDStatus struct
         void get_all(); // print the current RGB status of all LEDs to the serial monitor
+        bool is_dirty();     // Returns true if set() has been called since the last commit(),indicating the buffer has changes that have not yet been written to the LEDs. Returns false if the buffer matches the current state of the LEDs.
 
     private: // not accessible by user code
         static const int LED_PIN = 14; // define the GPIO pin that connects to first LED in daisy chain
         uint32_t led_data[NUM_LEDS] = {}; // zero initialised array which stores the colour of the LED (index = 0-11)
+        bool dirty = false; // start as written to the LEDs
 }; 

@@ -15,6 +15,7 @@ void LEDS::init() {
 void LEDS::set(int index, uint8_t r, uint8_t g, uint8_t b) { 
     // Note: don't need to reorder as per WS2812 because using dome top LED rather than flat top
     led_data[index] = (r << 24) | (g << 16) | (b << 8); // red bits 31-24; green bits 23-16; blue bits 15-8 // store colour in array (index 0-11 LED number)
+    LEDS::dirty = true; // update the dirty bool flag to true
 }
 
 void LEDS::set_all(uint8_t r, uint8_t g, uint8_t b) { 
@@ -30,6 +31,7 @@ void LEDS::commit() {
     for (int i=0; i < NUM_LEDS; i++) { // for each LED in the daisy-chain (0-11)
             pio_sm_put_blocking(pio0, 0, led_data[i]); // send its 24-bit BRG packet to the PIO state machine
         } // After all 12 packets are sent, PIO holds LOW for >208us (RESET) which latches the data and all LEDs update simultaneously (from datasheet)
+    LEDS:dirty = false; // update the dirty bool flag to false
 }
 
 void LEDS::clear_all() {
@@ -63,4 +65,9 @@ void LEDS::get_all() {
         LEDStatus status = get(i); // iteratively query all 12 LEDs
         printf("LED %d: R=%d G=s%d B=%d\n", i + 1, status.r, status.g, status.b); // print in serial port
     }
+}
+
+bool LEDS::is_dirty() { 
+    // Indicates whether current values have been updated but not yet written to the LEDs (true (1) means they have not been committed yet)
+    return dirty; // returns true (1) or false (0)
 }
