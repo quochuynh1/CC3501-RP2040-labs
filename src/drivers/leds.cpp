@@ -56,7 +56,6 @@ void LEDS::set_multiple(int* indices, int count, uint8_t r, uint8_t g, uint8_t b
     for (int i = 0; i < count; i++) { // iterate over each index in the array
         set(indices[i], r, g, b); // set the LED at that index to the given colour
     }
-    LEDS::commit();
 }
 
 LEDStatus LEDS::get(int index) {
@@ -80,4 +79,27 @@ void LEDS::get_all() {
 bool LEDS::is_dirty() { 
     // Indicates whether current values have been updated but not yet written to the LEDs (true (1) means they have not been committed yet)
     return dirty; // returns true (1) or false (0)
+}
+
+void LEDS::set_hsv(int index, float h, float s, float v) { 
+    // Conver from user given hsv to RGB so that leds.set() can communicate with the LEDs
+    // Help from: https://stackoverflow.com/questions/51203917/math-behind-hsv-to-rgb-conversion-of-colors
+    float r, g, b; // declare the three float variables for red, green, and blue respectively (e.g., R = 0.75; 75% red)
+    
+    int i = (int)(h / 60); //  calculate which sector of the hue spectrum currently in (0-5). hue is 0-360, there are 6 sectors each with 60 degrees
+    float f = (h / 60.0f) - i; // fractional position within the current sector (0.0-1.0)
+    float p = v * (1.0f - s); // minimum brightness (decreases as saturation increases)
+    float q = v * (1.0f - f * s); // falling edge value (channel fading in across this secotr)
+    float t = v * (1.0f - (1.0f - f) * s); // rising edge value (channell fading in across this sector)
+
+    switch(i % 6) { // assign RGB based on which sector the given hue falls within
+        case 0: r = v; g = t; b = p; break; // red to yellow
+        case 1: r = q; g = v; b = p; break; // yellow to grreen
+        case 2: r = p; g = v; b = t; break; // green to cyan
+        case 3: r = p; g = q; b = v; break; // cyan to blue
+        case 4: r = t; g = p; b = v; break; // blue to magenta
+        case 5: r = v; g = p; b = q; break; // magenta back to red
+        default: r = g = b = 0; break; // safety case
+    }
+    set(index, (uint8_t)(r * 255), (uint8_t)(g * 255), (uint8_t)(b * 255)); // convert floats (0.0-1.0) to uint8_t (0-255) and pass to set()
 }

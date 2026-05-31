@@ -21,6 +21,7 @@ class LEDS {
         LEDStatus get(int index); // takes an LED index and returns its current RGB values as an LEDStatus struct
         void get_all(); // print the current RGB status of all LEDs to the serial monitor
         bool is_dirty();     // Returns true if set() has been called since the last commit(),indicating the buffer has changes that have not yet been written to the LEDs. Returns false if the buffer matches the current state of the LEDs.
+        void set_hsv(int INDEX, float h, float s, float v); // takes the index of LED and HSV values (hue: 0-360; s: 0-1; v: 0-1); converts to RGB
 
         ~LEDS(); // destructor (manually frees memory now that we've moved from stack to heap allocation)
 

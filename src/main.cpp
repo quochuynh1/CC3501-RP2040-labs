@@ -68,8 +68,16 @@ int main()
 
         // Test Extension Functions 
         // 2. Add a way to update multiple LEDs in a single funciton call. 
-        int multiple_leds[] = {8, 9, 10, 11}; // right panel LEDs
-        leds.set_multiple(multiple_leds, 4, 0, 0, 255); // turn them blue
+        int multiple_leds1[] = {0, 1, 2, 3}; // left panel LEDs
+        leds.set_multiple(multiple_leds1, 4, 255, 0, 0); // turn them red
+        
+        int multiple_leds2[] = {4, 5, 6, 7}; // middle panel LEDs
+        leds.set_multiple(multiple_leds2, 4, 0, 0, 255); // turn them blue
+
+        int multiple_leds3[] = {8, 9, 10, 11}; // right panel LEDs
+        leds.set_multiple(multiple_leds3, 4, 0, 255, 0); // turn them green
+
+        leds.commit(); 
         sleep_ms(1000);
         leds.clear_all(); 
         sleep_ms(1000);
@@ -85,7 +93,7 @@ int main()
         leds.clear_all(); 
         sleep_ms(1000);
 
-        leds.set_all(60, 70, 80); // set all LEDs to 
+        leds.set_all(0, 255, 255); // set all LEDs to cyan 
         leds.commit(); 
         leds.get_all(); // query status of all LEDs
 
@@ -104,6 +112,18 @@ int main()
         sleep_ms(1000);
         leds.clear_all(); 
         sleep_ms(1000);
+
+        // 6. Implement alternative colour models such as HSV to make it
+        // easier to produce visually interesting animations.
+        for (int i = 0; i < leds.NUM_LEDS; i++) { 
+        leds.set_hsv(i, (360.0f / leds.NUM_LEDS) * i, 1.0f, 1.0f); // divides 360 degrees across 12 LEDs (i.e., LED 0 gets red, LED 6 gets cyan, etc.)
+        }
+        leds.commit();
+        sleep_ms(2000);
+        leds.clear_all(); 
+        sleep_ms(1000);
+
+
 }
     return 0;
 }
