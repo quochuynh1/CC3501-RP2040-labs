@@ -12,7 +12,7 @@ int main()
 {
     stdio_init_all();
     LEDS leds; // create instance of LEDS class
-    leds.init(); // initialise the LED drier
+    leds.init(12); // initialise the LED drier (Extension 5. Allow the user to customise the number of LEDs on the board instead of having it hardcoded (default 12))
 
     for (;;) {
         // Test the log system

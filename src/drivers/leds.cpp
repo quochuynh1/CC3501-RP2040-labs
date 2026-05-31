@@ -1,15 +1,25 @@
 #include "leds.h"
 #include <stdint.h>
 #include <stdio.h> // allows printf
+#include <stdlib.h> // allows calloc
 #include "hardware/gpio.h"
 #include "hardware/pio.h"
 #include "WS2812.pio.h"
 
 
-void LEDS::init() {
+void LEDS::init(int num_leds) { // takes number of LEDs in chain (default of 12)
     // Initialise PIO0 to control the LED chain
+    LEDS::NUM_LEDS = num_leds; // store the number of leds as a class member variable so the rest of the driver knows how many LEDs there are (i.e., remember how many LEDs the user wants)
+    led_data = (uint32_t*)calloc(NUM_LEDS, sizeof(uint32_t)); // heap-allocate an array of NUM_LEDS uint32_t values and point led_data at that memory (zeroed due to calloc) (i.e., reserve memory for the LED colour array at runtime)
+
     uint pio_program_offset = pio_add_program(pio0, &ws2812_program); // refactored from start code
     ws2812_program_init(pio0, 0, pio_program_offset, LED_PIN, 800000, false);
+
+    printf("NUM_LEDS = %d\n", NUM_LEDS); // debug print NUM_LEDS in serial monitor to test it was set correctly
+}
+
+LEDS::~LEDS() {
+    free(led_data); // release heap memory when LEDS object is destroyed (avoids memory leak)
 }
 
 void LEDS::set(int index, uint8_t r, uint8_t g, uint8_t b) { 
@@ -31,7 +41,7 @@ void LEDS::commit() {
     for (int i=0; i < NUM_LEDS; i++) { // for each LED in the daisy-chain (0-11)
             pio_sm_put_blocking(pio0, 0, led_data[i]); // send its 24-bit BRG packet to the PIO state machine
         } // After all 12 packets are sent, PIO holds LOW for >208us (RESET) which latches the data and all LEDs update simultaneously (from datasheet)
-    LEDS:dirty = false; // update the dirty bool flag to false
+    LEDS::dirty = false; // update the dirty bool flag to false
 }
 
 void LEDS::clear_all() {
@@ -63,7 +73,7 @@ void LEDS::get_all() {
     // LED numbering is displayed as 1-12 (maps internally to index 0-11).
     for (int i = 0; i < LEDS::NUM_LEDS; i++) { // for all 12 LEDs (index 0-11)
         LEDStatus status = get(i); // iteratively query all 12 LEDs
-        printf("LED %d: R=%d G=s%d B=%d\n", i + 1, status.r, status.g, status.b); // print in serial port
+        printf("LED %d: R=%d G=%d B=%d\n", i + 1, status.r, status.g, status.b); // print in serial port
     }
 }
 
