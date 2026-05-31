@@ -89,7 +89,7 @@ void LEDS::set_hsv(int index, float h, float s, float v) {
     int i = (int)(h / 60); //  calculate which sector of the hue spectrum currently in (0-5). hue is 0-360, there are 6 sectors each with 60 degrees
     float f = (h / 60.0f) - i; // fractional position within the current sector (0.0-1.0)
     float p = v * (1.0f - s); // minimum brightness (decreases as saturation increases)
-    float q = v * (1.0f - f * s); // falling edge value (channel fading in across this secotr)
+    float q = v * (1.0f - f * s); // falling edge value (channel fading out across this secotr)
     float t = v * (1.0f - (1.0f - f) * s); // rising edge value (channell fading in across this sector)
 
     switch(i % 6) { // assign RGB based on which sector the given hue falls within

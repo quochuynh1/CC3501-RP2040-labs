@@ -122,8 +122,6 @@ int main()
         sleep_ms(2000);
         leds.clear_all(); 
         sleep_ms(1000);
-
-
 }
     return 0;
 }
