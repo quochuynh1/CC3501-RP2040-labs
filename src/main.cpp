@@ -8,11 +8,13 @@
 #include "drivers/logging/logging.h"
 #include "drivers/leds.h"
 
+static const int LED_PIN = 14; // define the GPIO pin that connects to first LED in daisy chain
+
 int main()
 {
     stdio_init_all();
     LEDS leds; // create instance of LEDS class
-    leds.init(12); // initialise the LED drier (Extension 5. Allow the user to customise the number of LEDs on the board instead of having it hardcoded (default 12))
+    leds.init(12, LED_PIN); // initialise the LED drier (Extension 5. Allow the user to customise the number of LEDs on the board instead of having it hardcoded (default 12))
 
     for (;;) {
         // Test the log system
@@ -46,6 +48,19 @@ int main()
         leds.set(11, 255, 0, 255);
         leds.commit(); // turn the rest of the LEDs purple 
         sleep_ms(1000);
+        leds.clear_all(); 
+        sleep_ms(1000);
+
+        // Laurence - "write code so that the you can change the colour of ONE led, then change it back"
+        for(int i = 0; i < 10; i++) { 
+            leds.set(0, 255, 0, 0); 
+            leds.commit(); 
+            sleep_ms(200); 
+
+            leds.set(0, 0, 0, 255); 
+            leds.commit(); 
+            sleep_ms(200); 
+        }
 
         leds.clear_all();
         sleep_ms(1000); 
@@ -86,7 +101,7 @@ int main()
         int led_index = 3; //
         leds.set(led_index, 0, 255, 255); // set LED 4 to aqua
         leds.commit();
-        LEDStatus status = leds.get(3); // query LED 3 only
+        LEDStatus status = leds.get(3, LED_PIN); // query LED 3 only
         printf("LED %d: R=%d G=%d B=%d\n", led_index, status.r, status.g, status.b); // print in serial port
         
         sleep_ms(1000);
@@ -95,7 +110,7 @@ int main()
 
         leds.set_all(0, 255, 255); // set all LEDs to cyan 
         leds.commit(); 
-        leds.get_all(); // query status of all LEDs
+        leds.get_all(LED_PIN); // query status of all LEDs
 
         sleep_ms(1000);
         leds.clear_all(); 
