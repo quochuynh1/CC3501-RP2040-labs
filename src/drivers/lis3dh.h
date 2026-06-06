@@ -16,6 +16,4 @@ class LIS3DH {
         bool accel_read_register(uint8_t reg, uint8_t *data, uint8_t length); // a function that takes three parameters: the register to read; "data" is a pointer to a buffer into which the data will be placed; "length" s the number of bytes to read
         void read_accel_data(); // a function to read the acceleration data from the device. uses multi-byte reading and left-justified shifting, combining into a 16-bit integer, and removing the 6 padding zeros (M)
         float accel_data_to_g(int16_t raw_data); // a function to convert from the sensor's raw integers to floating point numbers in units of g = 9.81m/s^2
-
-        private: // not accessible by user code
 }; 

@@ -7,13 +7,18 @@
 #include "WS2812.pio.h" // This header file gets produced during compilation from the WS2812.pio file
 #include "drivers/logging/logging.h"
 #include "drivers/leds.h"
+#include "drivers/lis3dh.h"
 #include "board.h"
 
 int main()
 {
     stdio_init_all();
+
     LEDS leds; // create instance of LEDS class
     leds.init(12, LED_PIN); // initialise the LED drier (Extension 5. Allow the user to customise the number of LEDs on the board instead of having it hardcoded (default 12))
+
+    LIS3DH accel; // create instance of LIS3DH class
+    accel.init(); // initialise the accelerometer driver 
 
     for (;;) {
         // Test the log system
@@ -136,6 +141,10 @@ int main()
         sleep_ms(2000);
         leds.clear_all(); 
         sleep_ms(1000);
+
+        // Test lis3dh driver with spirit level program
+        accel.read_accel_data();  
+        sleep_ms(500); 
 }
     return 0;
 }

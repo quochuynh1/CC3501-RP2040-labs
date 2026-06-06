@@ -3,11 +3,12 @@
 #include "board.h"
 #include "lis3dh.h"
 #include "logging/logging.h" // allows log
+#include <stdio.h> // allows printf
 
 void LIS3DH::init() { 
     // Step 2. create a function to initialise your device driver.
     // Step 2a) use the i2c_init function to set up the RP2040’s I2C interface with a suitable baud rate
-    i2c_init(I2C_INSTANCE, 400 * 1000); // from lecture notes
+    i2c_init(I2C_PORT, 400 * 1000); // from lecture notes
     
     // Step 2b) use gpio_set_function to configure the SDA and SCL pins to be set as GPIO_FUNC_I2C
     gpio_set_function(ACCEL_SDA_PIN, GPIO_FUNC_I2C); // from lecture notes 
@@ -16,7 +17,7 @@ void LIS3DH::init() {
     // Step 2c) send I2C transaction ro read the value of the WHO_AM_I register and confirm that the returned
     // vlaue is correct. This will validate that I2C communications are working and the accelerometer is alive. 
     uint8_t who_am_i; 
-    accel_read_register(LIS3DH_WHO_AM_I_REG, &who_am_i, 1); // recall: '&' means "address of"
+    accel_read_register(LIS3DH_WHO_AM_I_REG, &who_am_i, 1); // '&' means "address of"
 
     if (who_am_i != LIS3DH_WHO_AM_I_VAL) { // if the who_am_i register does not match the expected value (defined in lis3dh.h)
         log(LogLevel::ERROR, "Accelerometer not found"); 
@@ -40,7 +41,7 @@ bool LIS3DH::accel_write_register(uint8_t reg, uint8_t data) {
     buf[0] = reg; // first byte is the register address - telling the slave which memory location to write to (e.g., the control register)
     buf[1] = data; // second byte is the actual data - the value you want to store there (e.g., a mode configuration) 
 
-    int bytes_written = i2c_write_blocking(I2C_INSTANCE, ACCEL_ADDRESS, buf, 2, false); // calls the SDK function to perform the actual I2C 
+    int bytes_written = i2c_write_blocking(I2C_PORT, ACCEL_ADDRESS, buf, 2, false); // calls the SDK function to perform the actual I2C 
     // write (I2C_INSTANCE: which bus (i2c0), set up previously in init(); ACCEL_ADDRESS: the slave address; buf: the buffer defined just above; 
     // 2: tells it there are 2 bytes to send; false: end the transactiona fter this)
     
@@ -54,7 +55,7 @@ bool LIS3DH::accel_write_register(uint8_t reg, uint8_t data) {
 bool LIS3DH::accel_read_register(uint8_t reg, uint8_t *data, uint8_t length) { 
     // Hint - These functions will be used within your device driver in multiple places. the example code fragments in the lecture slides will get you started. 
     // Tell the device which address we want to read
-    if (1 != i2c_write_blocking(I2C_INSTANCE, ACCEL_ADDRESS, &reg, 1, true)) { 
+    if (1 != i2c_write_blocking(I2C_PORT, ACCEL_ADDRESS, &reg, 1, true)) { 
         // You need to pass the pointer to the register address because
         // i2c_write_blocking expects a pointer to a buffer of data. 
         log(LogLevel::ERROR, "lis3dh::read_registers: Failed to select register address."); 
@@ -62,7 +63,7 @@ bool LIS3DH::accel_read_register(uint8_t reg, uint8_t *data, uint8_t length) {
     }
 
     // Now read the data (from lecture notes)
-    int bytes_read = i2c_read_blocking(I2C_INSTANCE, ACCEL_ADDRESS, data, length, false); 
+    int bytes_read = i2c_read_blocking(I2C_PORT, ACCEL_ADDRESS, data, length, false); 
     if (bytes_read != length) { 
         log(LogLevel::ERROR, "lis3dh::read_registers: Failed to read data."); 
         return false; 
@@ -83,6 +84,8 @@ void LIS3DH::read_accel_data() {
     int16_t x = (int16_t)(raw_data[0] | (raw_data[1] << 8)) >> 6; // from lecture notes
     int16_t y = (int16_t)(raw_data[2] | (raw_data[3] << 8)) >> 6; // M = 6 for LIS3DH as that's the number of padding zeros it adds
     int16_t z = (int16_t)(raw_data[4] | (raw_data[5] << 8)) >> 6; 
+
+    printf("Accelerometer position: x = %d; y = %d; z = %d\n", x, y, z); 
 } 
 
 float LIS3DH::accel_data_to_g(int16_t raw_data) { 
