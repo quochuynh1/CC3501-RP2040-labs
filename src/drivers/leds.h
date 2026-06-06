@@ -1,5 +1,6 @@
 #pragma once // only include header once per build/compilation
 #include <stdint.h> // allows uint8_t
+
 struct LEDStatus { // define a struct for LED status
             uint8_t r, g, b; // three 8-bit unsigned intergers for red, green, and blue (each 0-255)
         };
@@ -17,10 +18,10 @@ class LEDS {
 
         // Extra/Extension Functions
         void set_all(uint8_t r, uint8_t g, uint8_t b); // allow the user to change all LED colours at once
-        void set_multiple(int* indices, int count, uint8_t r, uint8_t g, uint8_t b); // User provides an array of specific LEDs (e.g., int multiple_leds[] = {6, 7, 8}) to change colours; int* indices = array name; int count = length of array
+        void set_multiple(int* indices, int count, uint8_t r, uint8_t g, uint8_t b); // user provides an array of specific LEDs (e.g., int multiple_leds[] = {6, 7, 8}) to change colours; int* indices = array name; int count = length of array
         LEDStatus get(int index, int LED_PIN); // takes an LED index and returns its current RGB values as an LEDStatus struct
         void get_all(int LED_PIN); // print the current RGB status of all LEDs to the serial monitor
-        bool is_dirty();     // Returns true if set() has been called since the last commit(),indicating the buffer has changes that have not yet been written to the LEDs. Returns false if the buffer matches the current state of the LEDs.
+        bool is_dirty(); // returns true if set() has been called since the last commit(),indicating the buffer has changes that have not yet been written to the LEDs. Returns false if the buffer matches the current state of the LEDs.
         void set_hsv(int index, float h, float s, float v); // takes the index of LED and HSV values (hue: 0-360; s: 0-1; v: 0-1); converts to RGB
 
         ~LEDS(); // destructor (manually frees memory now that we've moved from stack to heap allocation)

@@ -7,8 +7,7 @@
 #include "WS2812.pio.h" // This header file gets produced during compilation from the WS2812.pio file
 #include "drivers/logging/logging.h"
 #include "drivers/leds.h"
-
-static const int LED_PIN = 14; // define the GPIO pin that connects to first LED in daisy chain
+#include "board.h"
 
 int main()
 {
