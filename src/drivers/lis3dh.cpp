@@ -4,7 +4,6 @@
 #include "lis3dh.h"
 #include "logging/logging.h" // allows log
 
-
 void LIS3DH::init() { 
     // Step 2. create a function to initialise your device driver.
     // Step 2a) use the i2c_init function to set up the RP2040’s I2C interface with a suitable baud rate
@@ -19,7 +18,7 @@ void LIS3DH::init() {
     uint8_t who_am_i; 
     accel_read_register(LIS3DH_WHO_AM_I_REG, &who_am_i, 1); // recall: '&' means "address of"
 
-    if (who_am_i != LIS3DH_WHO_AM_I_VAL) { // if the who_am_i register does not match the expected value (defined in board.h)
+    if (who_am_i != LIS3DH_WHO_AM_I_VAL) { // if the who_am_i register does not match the expected value (defined in lis3dh.h)
         log(LogLevel::ERROR, "Accelerometer not found"); 
         return; 
     }
@@ -71,3 +70,17 @@ bool LIS3DH::accel_read_register(uint8_t reg, uint8_t *data, uint8_t length) {
     return true; 
 }
 
+void LIS3DH::read_accel_data() { 
+    // Step 3. Create a function to read the acceleration data from the device. 
+    // Step 3a) Perform a multi-byte read to obtain the most recently measured accelerations
+    // along X,Y, and Z axes in a single transaction
+    uint8_t raw_data[6]; // from lecture notes
+    uint8_t reg = LIS3DH_OUT_X_L | 0x80; // set SUB(7) = 1 to enable sequential multi-byte read
+    accel_read_register(reg, raw_data, 6); // perform the multi-byte read using the function made above
+
+    // Step 3b) Convert these to a signed 16-bit integers and right shift them correctly, as per 
+    // the discussion in the lecture notes. 
+    int16_t x = (int16_t)(raw_data[0] | (raw_data[1] << 8)) >> 6; // from lecture notes
+    int16_t y = (int16_t)(raw_data[2] | (raw_data[3] << 8)) >> 6; // M = 6 for LIS3DH as that's the number of padding zeros it adds
+    int16_t z = (int16_t)(raw_data[4] | (raw_data[5] << 8)) >> 6; 
+} 
