@@ -84,3 +84,12 @@ void LIS3DH::read_accel_data() {
     int16_t y = (int16_t)(raw_data[2] | (raw_data[3] << 8)) >> 6; // M = 6 for LIS3DH as that's the number of padding zeros it adds
     int16_t z = (int16_t)(raw_data[4] | (raw_data[5] << 8)) >> 6; 
 } 
+
+float LIS3DH::accel_data_to_g(int16_t raw_data) { 
+    // Step 4. Create a function to convert from the sensor's raw integers to floating point numbers in units of g = 9.81m/s^2 (the
+    // strength of gravity on Earth's surface). 
+
+    // For this, you will need to find the sensityivy of the accelerometer from the datasheet to obtain the conversion factor. 
+    // From datasheet: when FS bit set to 00 + normal mode, sensitivity = 4 mg/digit
+    return (raw_data * 4.0f)/1000.0f; // multiply by sensitivity factor, then divide by 1000 to convert mg to g
+}
