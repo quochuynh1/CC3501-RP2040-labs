@@ -105,3 +105,12 @@ void LEDS::set_hsv(int index, float h, float s, float v) {
     }
     set(index, (uint8_t)(r * 255), (uint8_t)(g * 255), (uint8_t)(b * 255)); // convert floats (0.0-1.0) to uint8_t (0-255) and pass to set()
 }
+
+void LEDS::set_multiple_hsv(int* indices, int count, float h, float s, float v) { 
+    // User provides an array of specific LEDs (e.g., int top_leds[] = {0, 1, 2, 3}) to change colours
+    // int* indices = array name
+    // int count = length of array
+    for (int i = 0; i < count; i++) { // iterate over each index in the array
+        set_hsv(indices[i], h, s, v); // set the LED at that index to the given colour
+    }
+}

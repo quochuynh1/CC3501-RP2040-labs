@@ -23,6 +23,7 @@ class LEDS {
         void get_all(int LED_PIN); // print the current RGB status of all LEDs to the serial monitor
         bool is_dirty(); // returns true if set() has been called since the last commit(),indicating the buffer has changes that have not yet been written to the LEDs. Returns false if the buffer matches the current state of the LEDs.
         void set_hsv(int index, float h, float s, float v); // takes the index of LED and HSV values (hue: 0-360; s: 0-1; v: 0-1); converts to RGB
+        void set_multiple_hsv(int* indices, int count, float h, float s, float v); // same logic as set_multiple(), just with hsv
 
         ~LEDS(); // destructor (manually frees memory now that we've moved from stack to heap allocation)
 
