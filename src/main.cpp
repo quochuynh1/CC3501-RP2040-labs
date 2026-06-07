@@ -11,7 +11,7 @@
 #include "board.h"
 #include <math.h>
 
-void run_leds_test(LEDS &leds) { 
+void run_long_leds_test(LEDS &leds) { 
     // LED Assessment Demo
     // 1. The user code can request to change a single LED, without having
     // to remember all the others. This means your driver must memorise the 
@@ -131,6 +131,43 @@ void run_leds_test(LEDS &leds) {
     sleep_ms(1000);
 }
 
+void run_short_leds_test(LEDS &leds) { 
+    // 1. Single LED change - others remain unchanged
+    leds.set(0, 255, 0, 0); // LED 0 red
+    leds.set(1, 0, 255, 0); // LED 1 green
+    leds.set(2, 0, 0, 255); // LED 2 blue
+    leds.commit();
+    sleep_ms(1000);
+
+    leds.set(1, 255, 255, 255); // change only LED 1 to white; 0 and 2 unchanged
+    leds.commit();
+    sleep_ms(1000);
+
+    leds.set(1, 0, 255, 0); // change back to green
+    leds.commit();
+    sleep_ms(1000);
+
+    // 2. Batch multiple changes before a single commit
+    leds.set(3, 255, 0, 255);
+    leds.set(4, 255, 0, 255);
+    leds.set(5, 255, 0, 255);
+    leds.commit(); // all three go purple at once
+    sleep_ms(1000);
+
+    // Walking rainbow on remaining LEDs (hue mapped to just these 6)
+    int remaining_leds[] = {6, 7, 8, 9, 10, 11};
+    for (int i = 0; i < 6; i++) {
+        leds.set_hsv(remaining_leds[i], (360.0f / 6) * i, 1.0f, 1.0f);
+        leds.commit();
+        sleep_ms(200);
+    }
+    sleep_ms(2000);
+
+    // 3. Clear all LEDs
+    leds.clear_all();
+    sleep_ms(1000);
+}
+
 void run_spirit_level(LEDS &leds, LIS3DH &accel) { 
     // Test lis3dh driver over serial port
     AccelData raw_data = accel.read_accel_data(); // reade raw integer readings from accelerometer into a struct
@@ -140,27 +177,27 @@ void run_spirit_level(LEDS &leds, LIS3DH &accel) {
     printf("x: %.2fg, y: %.2fg, z: %.2fg\n", x_g, y_g, z_g); // print in serial for debugging
     sleep_ms(100);
 
-    float magnitude = sqrt(x_g * x_g + y_g * y_g); 
+    float magnitude = sqrt(x_g * x_g + y_g * y_g); // allows for reduced sensitivity (i.e., deadzone before leds kick in)
 
-    if (magnitude < 0.15f) { 
-        int level_leds[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
-        leds.set_multiple_hsv(level_leds, 12, 120.0f, 1, 0.5); 
+    if (magnitude < 0.15f) { // when board is approximately level
+        int level_leds[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}; // all 12 LEDs 
+        leds.set_multiple_hsv(level_leds, 12, 120.0f, 1, 0.5); // set to half brightness
     } else { 
-        if (abs(x_g) > abs(y_g)) { 
-            if (x_g > 0) { 
-                int bottom_leds[] = {8, 9, 10, 11}; 
-                leds.set_multiple_hsv(bottom_leds, 4, 240.0f, 1.0f, 0.5f); 
+        if (abs(x_g) > abs(y_g)) { // assuming usb is orientated to the left (i.e., blank led panel left side)
+            if (x_g > 0) { // x-axis is dominant (tilting away)
+                int bottom_leds[] = {8, 9, 10, 11}; // light up bottom panel
+                leds.set_multiple_hsv(bottom_leds, 4, 240.0f, 1.0f, 0.5f); // light up blue - half brightness
             } else { 
-                int top_leds[] = {0, 1, 2, 3}; 
-                leds.set_multiple_hsv(top_leds, 4, 240.0f, 1.0f, 0.5f); 
+                int top_leds[] = {0, 1, 2, 3}; // light up the top panel if board is tilted in the negative x-axis
+                leds.set_multiple_hsv(top_leds, 4, 240.0f, 1.0f, 0.5f); // light up blue - half brightness
             }
         } else { 
-            if(y_g < 0) { 
-                int corner_leds[] = {0, 11}; 
-                leds.set_multiple_hsv(corner_leds,2, 240.0f, 1.0f, 0.5f); 
+            if(y_g < 0) { // y-axis is dominant 
+                int corner_leds[] = {0, 11}; // tilting the board right
+                leds.set_multiple_hsv(corner_leds,2, 240.0f, 1.0f, 0.5f); // corner LEDs light up blue
             } else { 
-                int right_leds[] = {4, 5, 6, 7}; 
-                leds.set_multiple_hsv(right_leds, 4, 240.0f, 1.0f, 0.5f);
+                int right_leds[] = {4, 5, 6, 7}; // tilting the board left
+                leds.set_multiple_hsv(right_leds, 4, 240.0f, 1.0f, 0.5f); // right panel lights up blue
             }   
         }
     }
@@ -178,13 +215,32 @@ int main()
     LIS3DH accel; // create instance of LIS3DH class
     accel.init(); // initialise the accelerometer driver 
 
+    int mode = 0; // tracks the current demo mode (0 = LED Driver; 1 = spirit level)
+    bool last_button_state = false; // stores previous button state
+
     for (;;) {
         // Test the log system
         log(LogLevel::INFORMATION, "Hello world");  
         
-        // Test spirit level program
-        run_spirit_level(leds, accel); 
-        
+        // Allow the SW1 to toggle between different test scenarios
+        bool current_button_state = gpio_get(SW1_PIN); // read current button state
+        if (current_button_state && !last_button_state) { 
+            mode = (mode + 1) % 2; // cycle between mode 0 and 1
+            printf("MODE: %d\n", mode); // print mode to serial for debugging
+        }
+        last_button_state = current_button_state; // store state for next iteration
+
+        switch(mode) { 
+            case 0: 
+                // Test the LED Driver
+                run_short_leds_test(leds); 
+                break; 
+            case 1: 
+                // Test the spirit level program (lis3dh Driver)
+                run_spirit_level(leds, accel); 
+                break; 
+        }
+        sleep_ms(50); // debounce
     }
     return 0;
 }
