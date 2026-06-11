@@ -6,7 +6,15 @@
 #define LIS3DH_WHO_AM_I_REG 0x0F // register address
 #define LIS3DH_WHO_AM_I_VAL 0x33 // expected value
 #define LIS3DH_CTRL_REG1 0x20 // section  8.8 of datasheet (20h) configure axises 
+// Feedback from Laurence: it is better to define the bit shifts so that it is clearer 
+// what we are configuring the accelerometer to. Rather than just saying "0x27" 
+    #define RATE_10HZ (0x02 << 4) // shift the bits so the ODRs are set for 10Hz (0x002 = 0010)
+    #define X_ENABLE 1 // enable x-axis
+    #define Y_ENABLE (1 << 1) // shift 1 bit left once to enable y-axis
+    #define Z_ENABLE (1 << 2) // shift 1 bit left twice to enable z-axis
 #define LIS3DH_CTRL_REG4 0x23 // section 8.11 of datasheet (23h) range of accelerometer
+    #define HIGH_RESOLUTION (1 << 3) // shift 1 bit to the left 3x so that HR is enabled
+    #define RANGE_2G 0 // leave as default (±2g apprpriate for spirit level application)
 #define LIS3DH_OUT_X_L 0x28 // section 8.16 of datasheet (28h) x-axis acceleration data
 
 struct AccelData { // define a struct for the raw data of the accelerometer
