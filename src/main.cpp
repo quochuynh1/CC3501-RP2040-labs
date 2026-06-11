@@ -10,6 +10,7 @@
 #include "drivers/lis3dh.h"
 #include "board.h"
 #include <math.h>
+#include "drivers/microphone.h"
 
 void run_long_leds_test(LEDS &leds) { 
     // LED Assessment Demo
@@ -205,6 +206,23 @@ void run_spirit_level(LEDS &leds, LIS3DH &accel) {
     leds.clear_all(); 
 }
 
+void run_microphone_test(MICROPHONE &mic) { 
+    uint16_t adc_data[256]; // declare an array of 256 unsigned 16-bit integers
+    mic.read(adc_data, 256); // buffer (adc_data) contains 256 raw ADC samples, each one a 12-bit value between 0, and 4095
+
+    // Calculate the average ADC value  
+    uint32_t sum = 0;
+    for (int i = 0; i < 256; i++) {
+        sum += adc_data[i];
+    }
+    float mean = sum / 256.0f;
+
+    // Use the serial port to inspect the numbers and confirm that they tend to oscillate around the expected value
+    // Note: DC bias at Vcc/2 = 3.3V/2 = 1.65V; therefore, expected_mean = (1.65/3.3) * 4095 = 2047
+    printf("Mean ADC: %.1f\n", mean); 
+    sleep_ms(500); 
+}
+
 int main()
 {
     stdio_init_all();
@@ -215,6 +233,9 @@ int main()
     LIS3DH accel; // create instance of LIS3DH class
     accel.init(); // initialise the accelerometer driver 
 
+    MICROPHONE mic; // create instance of MICROPHONE class
+    mic.init(); // initialise the microphone driver
+
     int mode = 0; // tracks the current demo mode (0 = LED Driver; 1 = spirit level)
     bool last_button_state = false; // stores previous button state
 
@@ -224,8 +245,9 @@ int main()
         
         // Allow the SW1 to toggle between different test scenarios
         bool current_button_state = gpio_get(SW1_PIN); // read current button state
+        int number_of_modes = 3; 
         if (current_button_state && !last_button_state) { 
-            mode = (mode + 1) % 2; // cycle between mode 0 and 1
+            mode = (mode + 1) % number_of_modes; // cycle between mode 0 and 1
             printf("MODE: %d\n", mode); // print mode to serial for debugging
         }
         last_button_state = current_button_state; // store state for next iteration
@@ -239,8 +261,12 @@ int main()
                 // Test the spirit level program (lis3dh Driver)
                 run_spirit_level(leds, accel); 
                 break; 
+            case 2: 
+                // Test the microphone
+                run_microphone_test(mic); 
+                break; 
         }
-        sleep_ms(50); // debounce
+        sleep_ms(100); // debounce
     }
     return 0;
 }
