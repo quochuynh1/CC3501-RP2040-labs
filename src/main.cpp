@@ -262,7 +262,7 @@ int main()
                 run_spirit_level(leds, accel); 
                 break; 
             case 2: 
-                // Test the microphone
+                // Test the Microphone Driver
                 run_microphone_test(mic); 
                 break; 
         }

@@ -3,6 +3,6 @@
 
 class MICROPHONE { 
     public: 
-        void init();
-        void read(uint16_t *adc_data, uint16_t number_of_sames);    
+        void init(); // a function to initialise the microphone and ADC
+        void read(uint16_t *adc_data, uint16_t number_of_samples); // read number_of_samples from the microphone into adc_data
 }; 
