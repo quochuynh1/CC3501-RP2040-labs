@@ -95,6 +95,14 @@ AccelData LIS3DH::read_accel_data() {
     // Double check this: from what I understand, because we set the accelerometer to Normal Mode, section 3.2.1 says that it's 10-bit data output
     // and therefore, you would need to right shift by 6. But, as Laurence pointed out, I should configure the accelerometer in High-resolution mode. 
     // Still need to right shift by M = 4 even in HR mode though. Speak with Laurence or email Luke. 
+
+    // After clarifying with Luke, he said to leave the 4-bit right shift (High-resolution mode) 
+    // He basically said that the even if the scaling factor is out by some common marging, it is still possible to map the LEDs effectively for the
+    // spirit level lab demonstration - which is the important deliverable for Lab 3. 
+
+    // However, the datasheet sensitivity of 1mg/digit is defined for the 12-bit HR value. So, if we were to leave out the bit shift for a more precise 
+    // output (as Laurence is saying), the raw value is 16x larger than the 12-bit value so, we would need to scale it down accordingly: 
+    // So the new sensitivity factor would be: (1mg/digit)/16 = 0.0625
     return data;  
 } 
 
@@ -105,4 +113,7 @@ float LIS3DH::accel_data_to_g(int16_t raw_data) {
     // For this, you will need to find the sensityivy of the accelerometer from the datasheet to obtain the conversion factor. 
     // From datasheet: when FS bit set to High-resolution, sensitivity = 1 mg/digit
     return (raw_data * 1.0f)/1000.0f; // multiply by sensitivity factor, then divide by 1000 to convert mg to g
+
+    // If we were to leave out the bit shift for full precesion scaling factor would be: (1mg/digit)/16 = 0.0625 
+    // Therefore: return (raw_data * 0.0625f)/1000.0f
 }
