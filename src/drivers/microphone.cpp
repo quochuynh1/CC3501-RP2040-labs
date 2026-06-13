@@ -12,7 +12,7 @@ void MICROPHONE::init() {
     adc_fifo_setup(true, false, 1, false, false); // enable FIFO, disable DMA
 }
 
-void MICROPHONE::read(uint16_t *adc_data, uint16_t number_of_samples) { 
+void MICROPHONE::read(uint16_t *adc_data, uint16_t number_of_samples) { // read number of ADC samples into adc_data buffer
     adc_run(true); // (a) turn on free-running sampling mode
 
     for (int i = 0; i < number_of_samples; i++) { 
