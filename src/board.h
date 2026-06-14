@@ -6,4 +6,4 @@
 #define MIC_PIN 26 // GPIO pin 26
 
 static const int LED_PIN = 14; // define the GPIO pin that connects to first LED in daisy chain
-
+static const int NUM_LEDS = 12; // define how many LEDs our board has
