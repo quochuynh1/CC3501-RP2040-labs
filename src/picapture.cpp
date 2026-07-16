@@ -64,6 +64,10 @@
 //     // Create the thresholded display window
 //     namedWindow("Thresholded", WINDOW_AUTOSIZE);
 
+//     // Allow for adjustable strucutring element sizes for open and close operations
+//     int morphSize = 3; 
+//     createTrackbar("MorphSize", "Control", &morphSize, 20); // morphSize (1 - 20)
+
 //     for(;;) {
 //         if (!cap.read(frame)) {
 //             printf("Could not read a frame.\n");
@@ -94,10 +98,13 @@
 
 //         // 2. Enhance your thresholding image using morphological open and close operations. 
 //         // Generate the structure element in OpenCV (from Week 7 Lecture Notes)
-//         Mat kernel = getStructuringElement(MORPH_RECT, Size(5, 5));
+//         int size = (morphSize < 1) ? 1 : morphSize; // prevents crashing when slider hits 0
+//         Mat kernel = getStructuringElement(MORPH_RECT, Size(size, size)); 
+
 //         // Applying morphological operations (from Week 7 Lecture Notes)
 //         // Morphological open tends to eliminate "salt" noise and clean up the background. 
 //         morphologyEx(thresh_img, thresh_img, MORPH_OPEN, kernel); 
+        
 //         // Morphological close tends to eliminate "pepper" noise and tidy up the foreground. 
 //         morphologyEx(thresh_img, thresh_img, MORPH_CLOSE, kernel);
 
