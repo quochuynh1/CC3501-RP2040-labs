@@ -74,10 +74,6 @@
 //             break;
 //         }
 
-//         // Show frame
-//         cv::imshow("Camera", frame);
-//         cv::waitKey(1);
-
 //         // Measure the frame rate
 //         frame_id++;
 //         if (frame_id >= 30) {
@@ -94,7 +90,10 @@
         
 //         // Threshold the image
 //         Mat thresh_img;
-// 		inRange(hsv_img, Scalar(iLowH, iLowS, iLowV), Scalar(iHighH, iHighS, iHighV), thresh_img);
+// 		   inRange(hsv_img, Scalar(iLowH, iLowS, iLowV), Scalar(iHighH, iHighS, iHighV), thresh_img);
+
+//         // Show the thresholded image
+// 		   imshow("Thresholded", thresh_img);  
 
 //         // 2. Enhance your thresholding image using morphological open and close operations. 
 //         // Generate the structure element in OpenCV (from Week 7 Lecture Notes)
@@ -115,12 +114,22 @@
 //             double x = m.m10 / m.m00; 
 //             double y = m.m01 / m.m00;
 //             printf("Object detected at (x=%.1f, y=%.1f)\n", x, y);
-//         }
 
+//         // Extension Tasks: 
+//         // 1. Draw a border around the detected objects (Hint: findContours and drawContours OpenCV functions).
+//         std::vector<std::vector<Point>> contours;
+//         findContours(thresh_img, contours, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
+//         drawContours(frame, contours, -1, Scalar(0, 0, 255), 2);
+
+//         // 2. Display the centre of mass coordinates on the image itself (Hint: putText OpenCV function).
+//         char coordText[50];
+//         snprintf(coordText, sizeof(coordText), "%.1f, %.1f", x, y);
+//         putText(frame, coordText, Point((int)x, (int)y),FONT_HERSHEY_SIMPLEX, 0.7, Scalar(255, 255, 255), 2);
+//         }
+    
 //         // Show the live camera feed
-//         imshow("Camera", frame);
-// 		// Show the thresholded image
-// 		imshow("Thresholded", thresh_img);  
+//         cv::imshow("Camera", frame);
+//         cv::waitKey(1);
 //     }
 
 //     // Free the camera 
