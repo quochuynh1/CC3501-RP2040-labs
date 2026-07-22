@@ -326,7 +326,7 @@ void run_advanced_mic_app(LEDS &leds, MICROPHONE &mic, arm_rfft_instance_q15 &ff
     // 3. Construct a new int16_t array to contain the time domain signal
     int16_t time_domain[1024]; 
     for (int i = 0; i < 1024; i++) { 
-        time_domain[i] = adc_data[i] - dc_bias; // fill in each element in the buffer by taking the raw ADC values and subtracting off the DC bias
+        time_domain[i] = (adc_data[i] - dc_bias) << 3; // fill in each element in the buffer by taking the raw ADC values and subtracting off the DC bias
         
         // Note: lab instructions said to left shift << 3, or << 5 for higher precision, however Luke later put 
         // out an announcement saying that "simply left-shifting is likely to overflow the representation" 
