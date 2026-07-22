@@ -2,8 +2,10 @@
 // application to post messages to the server. All the code was done locally on the Pi itself. 
 
 // #include <curl/curl.h>
+// #include <curl/curl.h>
 // #include <stdio.h>
 // #include <fcntl.h>
+// #include <cstring>
 
 // // To call we use ./http_client google.com
 
@@ -48,12 +50,16 @@
 // int main(int argc, char *argv[])
 // {
 //     // argc is the number of command-line arguments provided to the program.
-//     // The first argument (argv[0]) is always the name of the program.
-//     if (argc < 2) {
+//     // The first argument (argv[0]) is always the name of the program).
+//     // We need username + message = 3 args total
+//     if (argc < 3) {
 //         printf("Usage:\n");
-//         printf("%s URL    Fetch the specified HTTP URL\n", argv[0]);
+//         printf("%s <username> <message>    Post a message to the server\n", argv[0]);
 //         return 1;
 //     }
+
+//     char *username = argv[1];
+//     char *message  = argv[2];
 
 //     // Initialise the HTTP library
 //     CURL *curl = curl_easy_init();
@@ -62,16 +68,39 @@
 //         return 1;
 //     }
 
+//     // URL-encode the username and message (handles spaces -> %20 etc.)
+//     char *escapedUsername = curl_easy_escape(curl, username, strlen(username));
+//     char *escapedMessage  = curl_easy_escape(curl, message, strlen(message));
+
+//     if (!escapedUsername || !escapedMessage) {
+//         fprintf(stderr, "Failed to escape parameters\n");
+//         curl_easy_cleanup(curl);
+//         return 1;
+//      }
+
+//      // Use the Full reuest URI: found earlier in Lab 8
+//     char url[512];
+//     snprintf(url, sizeof(url),
+//              "http://api.thingspeak.com/update?api_key=ZKE95ZURWV7DW8B0&field1=%s&field2=%s",
+//              escapedUsername, escapedMessage);
+
+//     curl_free(escapedUsername);
+//     curl_free(escapedMessage);
+
+//     printf("Requesting: %s\n", url);
+
 //     // Set the callback function that will receive the actual data
 //     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, http_callback);
 
 //     // Configure the URL to load
-//     curl_easy_setopt(curl, CURLOPT_URL, argv[1]);
+//     curl_easy_setopt(curl, CURLOPT_URL, url);
 
 //     // Send the HTTP request
 //     CURLcode res = curl_easy_perform(curl);
 //     if (res != CURLE_OK) {
 //         fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
+//         curl_easy_cleanup(curl);
+//         return 1;
 //     }
 
 //     // Done
